@@ -64,6 +64,26 @@ class Book {
    * */
 
   static async create(data) {
+    const bookRes = await db.query(
+      `SELECT isbn,
+                amazon_url,
+                author,
+                language,
+                pages,
+                publisher,
+                title,
+                year
+            FROM books 
+            WHERE isbn = $1`,
+      [data.isbn]
+    );
+
+    if (bookRes.rows.length != 0) {
+      throw {
+        message: `A book already exists with this isbn '${data.isbn}`,
+        status: 400,
+      };
+    }
     const result = await db.query(
       `INSERT INTO books (
             isbn,
